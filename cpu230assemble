@@ -1,0 +1,230 @@
+#!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
+#!/usr/bin/env python
+
+import sys
+import re
+import string
+
+def is_hex(s):
+     hex_digits = set(string.hexdigits)
+     # if s is long, then it is faster to check against a set
+     return all(c in hex_digits for c in s)
+
+def is_hex(s):
+    try:
+        int(s, 16)
+        return True
+    except ValueError:
+        return False
+
+f = open(sys.argv[1], "r")
+o = open("prog.bin", "w")
+
+data = {
+	'PC': 0x0000,
+	'A': 0x0001,
+	'B': 0x0002,
+	'C': 0x0003,
+	'D': 0x0004,
+	'E': 0x0005,
+	'S': 0x0006,
+	'HALT': 0x1,
+	'LOAD': 0x2,
+	'STORE': 0x3,
+	'ADD': 0x4,
+	'SUB': 0x5,
+	'INC': 0x6,
+	'DEC': 0x7,
+	'XOR': 0x8,
+	'AND': 0x9,
+	'OR': 0xA,
+	'NOT': 0xB,
+	'SHL': 0xC,
+	'SHR': 0xD,
+	'NOP': 0xE,
+	'PUSH': 0xF,
+	'POP': 0x10,
+	'CMP': 0x11,
+	'JMP': 0x12,
+	'JZ': 0x13,
+	'JE': 0x13,
+	'JNZ': 0x14,
+	'JNE': 0x14,
+	'JC': 0x15,
+	'JNC': 0x16,
+	'JA': 0x17,
+	'JAE': 0x18,
+	'JB': 0x19,
+	'JBE': 0x1A,
+	'READ': 0x1B,
+	'PRINT': 0x1C,
+}
+
+labels = {}
+lines = []
+commands = []
+
+for line in f:
+	line = line.strip()
+	lines.append(line)
+	words = line.split(" ")
+	commands.append(words)
+
+f.close()
+
+count = 0
+
+lines = list(filter(None, lines))
+
+for i in range(len(lines)):
+	found = re.search(r':', lines[i])
+	if found:
+		memh = hex(3*(i-count))
+		temp = lines[i]
+		temp = temp.replace(":", "")
+		labels[temp] = memh
+		count += 1
+	else:
+		pass
+
+for line in commands:
+	opcode = -1
+	addrmode = -1
+	operand = -1
+	if len(line) == 2:
+
+		opcode = hex(data[line[0]])
+		found11 = re.search("\[....\]", line[1])
+		foundascii = re.search("\'.\'", line[1])
+
+		if line[1] == "PC":
+			#operand is given in the register
+			addrmode = int("1", 16)
+			operand = hex(data[line[1]])	#hex
+		elif line[1] == "A":
+			#operand is given in the register
+			addrmode = int("1", 16)
+			operand = hex(data[line[1]])	#hex
+		elif line[1] == "B":
+			#operand is given in the register
+			addrmode = int("1", 16)
+			operand = hex(data[line[1]])	#hex
+		elif line[1] == "C":
+			#operand is given in the register
+			addrmode = int("1", 16)
+			operand = hex(data[line[1]])	#hex
+		elif line[1] == "D":
+			#operand is given in the register
+			addrmode = int("1", 16)
+			operand = hex(data[line[1]])	#hex
+		elif line[1] == "E":
+			#operand is given in the register
+			addrmode = int("1", 16)
+			operand = hex(data[line[1]])	#hex
+		elif line[1] == "S":
+			#operand is given in the register
+			addrmode = int("1", 16)
+			operand = hex(data[line[1]])	#hex
+		elif line[1] == "[PC]":
+			#operand’s memory address is given in the register
+			addrmode = int("2", 16)
+			temp = line[1]
+			temp = temp.replace("[", "")
+			temp = temp.replace("]", "")
+			operand = hex(data[temp])	#hex
+		elif line[1] == "[A]":
+			#operand’s memory address is given in the register
+			addrmode = int("2", 16)
+			temp = line[1]
+			temp = temp.replace("[", "")
+			temp = temp.replace("]", "")
+			operand = hex(data[temp])	#hex
+		elif line[1] == "[B]":
+			#operand’s memory address is given in the register
+			addrmode = int("2", 16)
+			temp = line[1]
+			temp = temp.replace("[", "")
+			temp = temp.replace("]", "")
+			operand = hex(data[temp])	#hex
+		elif line[1] == "[C]":
+			#operand’s memory address is given in the register
+			addrmode = int("2", 16)
+			temp = line[1]
+			temp = temp.replace("[", "")
+			temp = temp.replace("]", "")
+			operand = hex(data[temp])	#hex
+		elif line[1] == "[D]":
+			#operand’s memory address is given in the register
+			addrmode = int("2", 16)
+			temp = line[1]
+			temp = temp.replace("[", "")
+			temp = temp.replace("]", "")
+			operand = hex(data[temp])	#hex
+		elif line[1] == "[E]":
+			#operand’s memory address is given in the register
+			addrmode = int("2", 16)
+			temp = line[1]
+			temp = temp.replace("[", "")
+			temp = temp.replace("]", "")
+			operand = hex(data[temp])	#hex
+		elif line[1] == "[S]":
+			#operand’s memory address is given in the register
+			addrmode = int("2", 16)
+			temp = line[1]
+			temp = temp.replace("[", "")
+			temp = temp.replace("]", "")
+			operand = hex(data[temp])	#hex
+		elif is_hex(line[1]):
+			#operand is immediate data
+			addrmode = int("0", 16)
+			temp = line[1]
+			temp2 = int(temp, base=16)
+			operand = hex(temp2)	#hex
+		elif foundascii:
+			#operand is immediate data and an ascii character
+			addrmode = int("0", 16)
+			temp = line[1]
+			res = temp.replace("'", "")
+			operand = hex(ord(res))	#hex
+		elif found11:
+			#operand is a memory address
+			addrmode = int("3", 16)
+			temp = line[1]
+			temp = temp.replace("[", "")
+			temp = temp.replace("]", "")
+			temp2 = "0x" + temp
+			bex2 = int(temp2, base=16)
+			operand = hex(bex2)	#hex
+		else:
+			#operand is a labeled variable
+			addrmode = int("0", 16)
+			operand = labels[line[1]]	#hex
+	else:
+		if line[0] == "HALT":
+			opcode = hex(data[line[0]])
+			addrmode = int("0", 16)
+			operand = hex(0)
+		elif line[0] == "NOP":
+			opcode = hex(data[line[0]])
+			addrmode = int("0", 16)
+			operand = hex(0)
+		else:
+			pass
+
+	if opcode != -1 and addrmode != -1 and operand != -1:
+		iopcode = int(opcode, 16)
+		ioperand = int(operand, 16)
+		bopcode = format(iopcode, '06b')
+		baddrmode = format(addrmode, '02b') 
+		boperand = format(ioperand, '016b') 
+		bin = '0b' + bopcode + baddrmode + boperand 
+		ibin = int(bin[2:],2) ; 
+		instr = format(ibin, '06x')
+		instr = instr.upper()
+		o.write(instr + "\n")
+
+o.close()
+
+
+
+
