@@ -6,7 +6,7 @@ Computer Engineering Department
 
 Spring 2021
 
-CMPE 230
+CMPE 230 - Systems Programming
 
 Project 2
 
