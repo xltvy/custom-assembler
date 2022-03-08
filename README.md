@@ -10,8 +10,7 @@ CMPE 230
 
 Project 2
 
-Altay Acar
-Engin Oguzhan Senol
+Altay Acar & Engin Oguzhan Senol
 
 ***
 
